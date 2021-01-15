@@ -50,7 +50,8 @@ async function popular(page) {
 async function search(query) {
     var anime_list = []
 
-
+	query = encodeURIComponent(query)
+	console.log(query)
     res = await axios.get(`https://gogoanime.so//search.html?keyword=${query}`)
     const body = await res.data;
     const $ = cheerio.load(body)
@@ -87,7 +88,7 @@ try {
 	anime_Genre = $('div.main_body  div:nth-child(2) > div.anime_info_body_bg > p:nth-child(6)').text()
 	anime_Genre = anime_Genre.replace("Genre: \n\t\t\t         ","")
 	anime_Genre = anime_Genre.replace("\t\t\t\t","")
-	let arr = anime_Genre.split(',')
+	let arr = anime_Genre.split(', ')
 	//return arr
 	anime_Released = $('div.main_body  div:nth-child(2) > div.anime_info_body_bg > p:nth-child(7)').text()
 	anime_Released = anime_Released.replace("Released: ","")
@@ -101,7 +102,7 @@ try {
 	//return anime_Status
 	anime_other_name = $('div.main_body  div:nth-child(2) > div.anime_info_body_bg > p:nth-child(9)').text()
 	anime_other_name = anime_other_name.replace("Other name: ","")
-	let arr2 = anime_other_name.split(', ')
+	let arr2 = anime_other_name.split(", ")
 	var rePattern = new RegExp(/value\=\"(.*?)\" id\=\"movie\_id/);
 	var arrMatches = body.match(rePattern);
 	//return arrMatches[1]
@@ -136,14 +137,16 @@ try {
 
 async function watchAnime(episode_id) {
 
-    res = await axios.get(`https://gogoanime.so/${episode_id}`)
-    const body = await res.data;
-    $ = cheerio.load(body)
-	console.log(`https://gogoanime.so/${episode_id}`)
+    //res = await axios.get(`https://gogoanime.so/${episode_id}`)
+    //const body = await res.data;
+    //$ = cheerio.load(body)
+	//console.log(`https://gogoanime.so/${episode_id}`)
 
-    episode_link = $('li.dowloads > a').attr('href')
+    //episode_link = $('li.dowloads > a').attr('href')
+	//console.log(episode_link)
 
-    ep = await getDownloadLink(episode_link)
+
+    ep = await getDownloadLink(`https://gogo-stream.com/download?id=${episode_id}`)
 
     return await (ep)
 
@@ -152,8 +155,15 @@ async function watchAnime(episode_id) {
 }
 
 async function getDownloadLink(episode_link) {
-
-    ep_array = []
+	function randomString(length, chars) {
+    var result = '';
+    for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+    return result;
+}
+	var rString = randomString(6, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+	//var type = 'article';
+	this[rString+'ep_array'] = [];  // in a function we use "this";
+	//var ep_array  = []
 try {
     res = await axios.get(episode_link)
     const body = await res.data;
@@ -166,14 +176,15 @@ try {
 
         ep_dic = { 'quality': ep_name.replace('Download\n', 'watch').replace(/ +/g, ""), 'ep_link': ep_link }
 
-        ep_array.push(ep_dic)
+        this[rString+'ep_array'].push(ep_dic)
     })
 
-
-    return await (ep_array)
+	//console.log('hash'+rString+'ep_array')
+    return await (this[rString+'ep_array'])
 	} catch (e) {
 				console.log(e)
 				console.log(episode_link)
+				//console.log(this[rString+'ep_array'])
 				
 		}
 
