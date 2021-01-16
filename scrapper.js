@@ -146,7 +146,7 @@ async function watchAnime(episode_id) {
 	//console.log(episode_link)
 
 
-    ep = await getDownloadLink(`https://gogo-stream.com/download?id=${episode_id}`)
+    ep = await getDownloadLink(`https://gogo-play.net/download?id=${episode_id}`)
 
     return await (ep)
 
